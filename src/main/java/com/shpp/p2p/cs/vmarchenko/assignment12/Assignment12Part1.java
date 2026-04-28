@@ -54,7 +54,7 @@ public class Assignment12Part1 {
     }
 
     /**
-     * It takes the file name and searches for that file in the resources folder.
+     * It takes the file name and searches for that file in the resources' folder.
      *
      * @param imageURL file name
      * @return a file with the appropriate name
@@ -196,7 +196,6 @@ public class Assignment12Part1 {
     /**
      * Based on an array containing average RGB values,
      * it is determined which value occurs most frequently.
-     *
      * I took this approach, where you need to determine the largest value,
      * and with an error, as a ready-made solution.
      *
