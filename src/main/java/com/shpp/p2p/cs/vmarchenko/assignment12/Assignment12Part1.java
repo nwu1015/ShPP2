@@ -5,8 +5,16 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Random;
+import java.util.stream.Collectors;
 
 public class Assignment12Part1 {
+
+    private static final int PIXELS_TO_DEFINE_BACKGROUND = 50;
+    private static final double CALCULATION_MISTAKE = 10;
+
     public static void main(String[] args) {
         Assignment12Part1 assignment = new Assignment12Part1();
 
@@ -22,26 +30,7 @@ public class Assignment12Part1 {
 
         assignment.defineBackground(image, isBackground);
 
-
-        int silhouetteCounter = 0;
-        double minSize = (image.getWidth() * image.getHeight()) * 0.01;
-
-        for(int y = 0; y < image.getHeight(); ++y) {
-            for(int x = 0; x < image.getWidth(); ++x) {
-
-                if(!isBackground[y][x] && !isVisited[y][x]) {
-                    int size = assignment.runDFSAlgorithm(x, y, isVisited, isBackground);
-
-                    if (size > minSize) {
-                        silhouetteCounter++;
-                    }
-                }
-
-
-            }
-        }
-
-        System.out.println(silhouetteCounter);
+        System.out.println(assignment.findSilhouettes(image, isVisited, isBackground));
 
 
     }
@@ -69,24 +58,92 @@ public class Assignment12Part1 {
         }
     }
 
-    private int findSilhouettes(BufferedImage image) {
+    private int findSilhouettes(BufferedImage image, boolean[][] isVisited, boolean[][] isBackground) {
+        int silhouetteCounter = 0;
+        double minSize = (image.getWidth() * image.getHeight()) * 0.01;
 
-        return 0;
+        for(int y = 0; y < image.getHeight(); y++) {
+            for(int x = 0; x < image.getWidth(); x++) {
+
+                if(!isBackground[y][x] && !isVisited[y][x]) {
+                    int size = runDFSAlgorithm(x, y, isVisited, isBackground);
+
+                    if (size > minSize) {
+                        silhouetteCounter++;
+                    }
+                }
+            }
+        }
+
+        return silhouetteCounter;
     }
 
     private void defineBackground(BufferedImage image, boolean[][] isBackground) {
-        for(int y = 0; y < image.getHeight(); ++y) {
-            for(int x = 0; x < image.getWidth(); ++x) {
+        int number;
+        int[] randomWidth = new int[PIXELS_TO_DEFINE_BACKGROUND];
+        number = image.getWidth();
+        fillTheArrayWithRandomNumbers(randomWidth, number);
+
+        int[] randomHeight = new int[PIXELS_TO_DEFINE_BACKGROUND];
+        number = image.getHeight();
+        fillTheArrayWithRandomNumbers(randomHeight, number);
+
+        double[] randomPixels = new double[PIXELS_TO_DEFINE_BACKGROUND];
+        getRandomPixels(image, randomWidth, randomHeight, randomPixels);
+
+        double backgroundIntensity = calculateIntensity(randomPixels);
+
+        for(int y = 0; y < image.getHeight(); y++) {
+            for(int x = 0; x < image.getWidth(); x++) {
 
                 int pixel = image.getRGB(x, y);
                 Color color = new Color(pixel);
-                double averageNumber = (color.getRed() + color.getGreen() + color.getBlue()) / 3.0;
-                if(averageNumber > 222.0) {
-                    isBackground[y][x] = true;
-                }
+                double currentPixelIntensity = (color.getRed() + color.getBlue() + color.getGreen()) / 3.0;
+
+                isBackground[y][x] = Math.abs(currentPixelIntensity - backgroundIntensity) < CALCULATION_MISTAKE;
 
             }
         }
+    }
+
+    private void fillTheArrayWithRandomNumbers(int[] array, int number){
+        Random rand = new Random();
+        for(int x = 0; x < array.length; x++){
+            if(x % 5 == 0){
+                if(x % 2 == 0){
+                    array[x] = 0;
+                }else {
+                    array[x] = number - 1;
+                }
+            }else {
+                array[x] = rand.nextInt(0, number);
+            }
+        }
+    }
+
+    private void getRandomPixels(BufferedImage image, int[] arrayWidth, int[] arrayHeight, double[] result){
+        if(arrayHeight.length != arrayWidth.length || arrayHeight.length != result.length){
+            throw new IllegalArgumentException("Arrays must have the same length");
+        }
+
+        for(int y = 0; y < result.length; y++){
+            int pixel = image.getRGB(arrayWidth[y], arrayHeight[y]);
+            Color color = new Color(pixel);
+            result[y] = (color.getRed() + color.getGreen() + color.getBlue()) / 3.0;
+        }
+    }
+
+    private double calculateIntensity(double[] randomPixels){
+        return Arrays.stream(randomPixels)
+                .boxed()
+                .collect(Collectors.groupingBy(
+                        val -> Math.round(val / CALCULATION_MISTAKE),
+                        Collectors.counting()
+                ))
+                .entrySet().stream()
+                .max(Map.Entry.comparingByValue())
+                .map(entry -> entry.getKey() * CALCULATION_MISTAKE)
+                .orElse(255.0);
     }
 
     private int runDFSAlgorithm(int x, int y, boolean[][] isVisited, boolean[][] isBackground) {
