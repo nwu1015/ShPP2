@@ -16,18 +16,17 @@ import java.util.stream.Collectors;
  * determines how many separate silhouettes are in the image
  *
  */
-
 public class Assignment12Part1 {
 
     /**
      * How many points will be taken to determine the background
      */
-    private static final int PIXELS_TO_DEFINE_BACKGROUND = 15;
+    private static final int PIXELS_TO_DEFINE_BACKGROUND = 20;
 
     /**
      * How much can the average RGB value deviate
      */
-    private static final double CALCULATION_MISTAKE = 10;
+    private static final double CALCULATION_MISTAKE = 15;
 
     /**
      * To determine the minimum silhouette size.
@@ -217,7 +216,7 @@ public class Assignment12Part1 {
 
     /**
      * Recursively traverses all connected pixels of the object (silhouette).
-     * It uses the DFS algorithm to calculate the total area of ​​the object in pixels.
+     * It uses the DFS algorithm to calculate the total area of the object in pixels.
      *
      * @param x The X coordinate of the current pixel.
      * @param y The Y coordinate of the current pixel.
