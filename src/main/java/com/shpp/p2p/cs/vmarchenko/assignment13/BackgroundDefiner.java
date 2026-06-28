@@ -64,10 +64,14 @@ public class BackgroundDefiner {
 
         for (int i = 0; i < histogram.length; i++) {
             weightBackground += histogram[i];
-            if (weightBackground == 0) continue;
+            if (weightBackground == 0){
+                continue;
+            }
 
             int weightForeground = totalPixels - weightBackground;
-            if (weightForeground == 0) break;
+            if (weightForeground == 0){
+                break;
+            }
 
             sumBackground += i * histogram[i];
             double sumForeground = totalSum - sumBackground;
@@ -96,15 +100,15 @@ public class BackgroundDefiner {
      * @return true if the background is lighter than the threshold, in other cases - false.
      */
     private boolean isBackgroundLight(BufferedImage image, int threshold) {
-        int w = image.getWidth();
-        int h = image.getHeight();
+        int width = image.getWidth();
+        int height = image.getHeight();
         double sum = 0;
         int count = 0;
 
         int[][] points = {
-                {0, 0}, {w / 2, 0}, {w - 1, 0},
-                {0, h / 2}, {w / 2, h / 2}, {w - 1, h / 2},
-                {0, h - 1}, {w / 2, h - 1}, {w - 1, h - 1}
+                {0, 0}, {width / 2, 0}, {width - 1, 0},
+                {0, height / 2}, {width / 2, height / 2}, {width - 1, height / 2},
+                {0, height - 1}, {width / 2, height - 1}, {width - 1, height - 1}
         };
 
         for (int[] p : points) {

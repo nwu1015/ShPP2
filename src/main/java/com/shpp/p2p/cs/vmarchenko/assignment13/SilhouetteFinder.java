@@ -35,10 +35,8 @@ public class SilhouetteFinder {
             return 0;
         }
 
-        Collections.sort(sizes);
-        double median = sizes.get(sizes.size() / 2);
-
-        double threshold = median * 0.1;
+        int maxSize = Collections.max(sizes);
+        double threshold = maxSize * Constants.NOISE_TOLERANCE;
 
         int count = 0;
         for (int size : sizes) {

@@ -12,4 +12,6 @@ public final class Constants {
     public static final double GREEN_COMPONENT_LUMINANCE = 0.587;
 
     public static final double BLUE_COMPONENT_LUMINANCE = 0.114;
+
+    public static final double NOISE_TOLERANCE = 0.15;
 }
