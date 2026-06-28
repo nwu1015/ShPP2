@@ -12,6 +12,8 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import  com.shpp.p2p.cs.vmarchenko.assignment11.Assignment11Part1;
+
 public class Assignment11Part1Test {
     private Assignment11Part1 instance;
 
