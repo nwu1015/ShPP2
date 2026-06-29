@@ -14,4 +14,6 @@ public final class Constants {
     public static final double BLUE_COMPONENT_LUMINANCE = 0.114;
 
     public static final double NOISE_TOLERANCE = 0.15;
+
+    public static final int NUMBER_OF_REDUCTION = 5;
 }

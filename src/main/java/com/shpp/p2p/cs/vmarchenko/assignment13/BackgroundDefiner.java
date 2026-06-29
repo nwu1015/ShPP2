@@ -3,6 +3,12 @@ package com.shpp.p2p.cs.vmarchenko.assignment13;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
+/**
+ * A class for determining where the background is and where the silhouette is.
+ * The histogram of the image is taken, and the threshold is calculated using the Otsu method.
+ * Then, along the perimeter of the image and also across the pixels,
+ * it is determined whether the background is brighter than the threshold or darker.
+ */
 public class BackgroundDefiner {
     /**
      * Method for determining the background by Otsu method
@@ -42,7 +48,7 @@ public class BackgroundDefiner {
      * Finds the optimal threshold value using Otsu's algorithm.
      * It iterates through all possible thresholds,
      * effectively separating the background from foreground silhouettes.
-     * <p>
+     *
      * At the previous level, background detection was implemented by taking random pixels.
      * However, this implementation was unpredictable. So, looking at other options, I found Otsu's method.
      * Source: https://cutt.ly/Wt5eT1Ne
@@ -93,7 +99,8 @@ public class BackgroundDefiner {
 
     /**
      * Determines whether the image background is light or dark.
-     * It checks the top-left corner pixel as a benchmark against the computed threshold.
+     * It checks the perimeter of the picture, as well as diagonally
+     * as a benchmark against the computed threshold.
      *
      * @param image     the given picture
      * @param threshold the calculated optimal Otsu threshold.
@@ -140,6 +147,12 @@ public class BackgroundDefiner {
         }
     }
 
+    /**
+     * Calculates the perceived brightness of a pixel using human eye color sensitivity coefficients.
+     *
+     * @param pixel The given pixel.
+     * @return The brightness value of the pixel.
+     */
     private double calculatePixelBrightness(int pixel) {
         Color colorInPixel = new Color(pixel);
         return Constants.RED_COMPONENT_LUMINANCE * colorInPixel.getRed() +

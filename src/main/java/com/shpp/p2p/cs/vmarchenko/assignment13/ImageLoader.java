@@ -7,6 +7,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+ * Class for defining a file. If no file is specified in the parameters,
+ * the default one is assigned.
+ * Otherwise, the one specified by the user is assigned.
+ */
 public class ImageLoader {
     /**
      * It takes the file name and searches for that file in the resources' folder.
