@@ -30,11 +30,6 @@ public class Assignment10Part1 {
         Assignment10Part1 mainClass = new Assignment10Part1();
 
         String formula = args[0];
-
-        if (formula.startsWith("-")) {
-            formula = "0" + formula;
-        }
-
         HashMap<String, Double> variables = mainClass.determineParameters(args);
 
         double result = mainClass.calculate(formula, variables);

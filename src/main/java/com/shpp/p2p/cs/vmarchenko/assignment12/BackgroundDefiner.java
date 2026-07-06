@@ -1,0 +1,162 @@
+package com.shpp.p2p.cs.vmarchenko.assignment12;
+
+import java.awt.*;
+import java.awt.image.BufferedImage;
+
+/**
+ * A class for determining where the background is and where the silhouette is.
+ * The histogram of the image is taken, and the threshold is calculated using the Otsu method.
+ * Then, along the perimeter of the image and also across the pixels,
+ * it is determined whether the background is brighter than the threshold or darker.
+ */
+public class BackgroundDefiner {
+    /**
+     * Method for determining the background by Otsu method
+     *
+     * @param image        given picture
+     * @param isBackground an array that collects information pixel
+     *                     by pixel whether this pixel belongs to the background
+     */
+    public void defineBackground(BufferedImage image, boolean[][] isBackground) {
+        int totalPixels = image.getHeight() * image.getWidth();
+
+        int[] histogram = calculateHistogram(image);
+        int threshold = findThreshold(histogram, totalPixels);
+        boolean isLight = isBackgroundLight(image, threshold);
+        applyThresholdMask(image, isBackground, threshold, isLight);
+    }
+
+    /**
+     * Calculates the grayscale brightness histogram of the entire image.
+     * Groups pixels into 256 bins based on their average RGB intensity.
+     *
+     * @param image given picture
+     * @return an array of size 256, where each index contains the count of pixels with that brightness
+     */
+    private int[] calculateHistogram(BufferedImage image) {
+        int[] histogram = new int[Constants.HISTOGRAM_ARRAY_LENGTH];
+        for (int y = 0; y < image.getHeight(); y++) {
+            for (int x = 0; x < image.getWidth(); x++) {
+                int brightness = (int) calculatePixelBrightness(image.getRGB(x, y));
+                histogram[brightness]++;
+            }
+        }
+        return histogram;
+    }
+
+    /**
+     * Finds the optimal threshold value using Otsu's algorithm.
+     * It iterates through all possible thresholds,
+     * effectively separating the background from foreground silhouettes.
+     *
+     * At the previous level, background detection was implemented by taking random pixels.
+     * However, this implementation was unpredictable. So, looking at other options, I found Otsu's method.
+     * Source: https://cutt.ly/Wt5eT1Ne
+     *
+     * @param histogram   the 256-bin brightness histogram of the image
+     * @param totalPixels the total number of pixels in the image.
+     * @return the optimal threshold brightness value (0-255).
+     */
+    private int findThreshold(int[] histogram, int totalPixels) {
+        int totalSum = 0;
+        for (int i = 0; i < histogram.length; i++) {
+            totalSum += i * histogram[i];
+        }
+
+        int weightBackground = 0;
+        double sumBackground = 0;
+        double maximum = 0;
+        int threshold = 0;
+
+        for (int i = 0; i < histogram.length; i++) {
+            weightBackground += histogram[i];
+            if (weightBackground == 0){
+                continue;
+            }
+
+            int weightForeground = totalPixels - weightBackground;
+            if (weightForeground == 0){
+                break;
+            }
+
+            sumBackground += i * histogram[i];
+            double sumForeground = totalSum - sumBackground;
+
+            double averageBrightnessBackground = sumBackground / weightBackground;
+            double averageBrightnessForeground = sumForeground / weightForeground;
+
+            double varBetween = (double) weightBackground * weightForeground *
+                    (averageBrightnessBackground - averageBrightnessForeground) *
+                    (averageBrightnessBackground - averageBrightnessForeground);
+
+            if (varBetween > maximum) {
+                maximum = varBetween;
+                threshold = i;
+            }
+        }
+        return threshold;
+    }
+
+    /**
+     * Determines whether the image background is light or dark.
+     * It checks the perimeter of the picture, as well as diagonally
+     * as a benchmark against the computed threshold.
+     *
+     * @param image     the given picture
+     * @param threshold the calculated optimal Otsu threshold.
+     * @return true if the background is lighter than the threshold, in other cases - false.
+     */
+    private boolean isBackgroundLight(BufferedImage image, int threshold) {
+        int width = image.getWidth();
+        int height = image.getHeight();
+        double sum = 0;
+        int count = 0;
+
+        int[][] points = {
+                {0, 0}, {width / 2, 0}, {width - 1, 0},
+                {0, height / 2}, {width / 2, height / 2}, {width - 1, height / 2},
+                {0, height - 1}, {width / 2, height - 1}, {width - 1, height - 1}
+        };
+
+        for (int[] p : points) {
+            sum += calculatePixelBrightness(image.getRGB(p[0], p[1]));
+            count++;
+        }
+
+        return (sum / count) > threshold;
+    }
+
+    /**
+     * Applies the final mask to the isBackground array based on the threshold.
+     * Compares each pixel's brightness to the threshold and marks it as background or silhouette.
+     *
+     * @param image             given picture.
+     * @param isBackground      the 2D boolean mask array to populate.
+     * @param threshold         the optimal brightness threshold to split pixels.
+     * @param isBackgroundLight a flag indicating whether background pixels are bright or dark.
+     */
+    private void applyThresholdMask(BufferedImage image, boolean[][] isBackground, int threshold, boolean isBackgroundLight) {
+        for (int y = 0; y < image.getHeight(); y++) {
+            for (int x = 0; x < image.getWidth(); x++) {
+                double currentBrightness = calculatePixelBrightness(image.getRGB(x, y));
+
+                isBackground[y][x] = isBackgroundLight ?
+                        (currentBrightness >= threshold) :
+                        (currentBrightness <= threshold);
+            }
+        }
+    }
+
+    /**
+     * Calculates the perceived brightness of a pixel using human eye color sensitivity coefficients.
+     *
+     * @param pixel The given pixel.
+     * @return The brightness value of the pixel.
+     */
+    private double calculatePixelBrightness(int pixel) {
+        Color colorInPixel = new Color(pixel);
+        return Constants.RED_COMPONENT_LUMINANCE * colorInPixel.getRed() +
+                Constants.GREEN_COMPONENT_LUMINANCE * colorInPixel.getGreen() +
+                Constants.BLUE_COMPONENT_LUMINANCE * colorInPixel.getBlue();
+    }
+}
