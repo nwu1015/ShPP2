@@ -1,6 +1,6 @@
 package com.shpp.p2p.cs.vmarchenko.collection;
 
-public class ArrayListRealization<E> implements List<E>{
+public class ArrayListRealization<E> implements ListRealization<E> {
     public static final int DEFAULT_CAPACITY = 10;
     public static final int QUANTITY_FOR_EXPANSION = 5;
 
@@ -13,7 +13,7 @@ public class ArrayListRealization<E> implements List<E>{
     }
 
     @Override
-    public boolean add(E element) {
+    public void add(E element) {
         if(index == list.length) {
             E[] copyList = list;
             list = (E[]) new Object[list.length + QUANTITY_FOR_EXPANSION];
@@ -22,11 +22,10 @@ public class ArrayListRealization<E> implements List<E>{
 
         list[index] = element;
         index++;
-        return true;
     }
 
     @Override
-    public boolean add(int index, E element) {
+    public void add(int index, E element) {
         if(index == list.length - 1) {
             E[] copyList = list;
             list = (E[]) new Object[list.length + QUANTITY_FOR_EXPANSION];
@@ -39,8 +38,6 @@ public class ArrayListRealization<E> implements List<E>{
         System.arraycopy(list, index, newList, index, list.length - index);
 
         list = newList;
-
-        return true;
     }
 
     @Override
