@@ -58,6 +58,7 @@ public class Assignment10Part1 {
      * Method for calculating an expression.
      * This is where reverse Polish notation is used.
      * I saw the idea of its implementation on the Internet.
+     * Source: https://cutt.ly/qyqTkvnj
      * Here we use the IAction interface, which has a calculate method for each operation.
      *
      * @param formula expression (first argument)

@@ -33,7 +33,7 @@ class Assignment10Part1Test {
      */
     private double runAndGetResult(String... args) {
         outputStreamCaptor.reset(); // Очищуємо буфер перед новим тестом
-        com.shpp.p2p.cs.vmarchenko.assignment11.Assignment11Part1.main(args);
+        com.shpp.p2p.cs.vmarchenko.assignment10.Assignment10Part1.main(args);
 
         String output = outputStreamCaptor.toString().trim();
         // Твоя програма друкує результат як рядок масиву, наприклад: "[5.0]"
