@@ -1,24 +1,29 @@
 package com.shpp.p2p.cs.vmarchenko.collection;
 
-public class LinkedListRealization<E> implements ListRealization<E> {
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.function.Consumer;
 
+public class LinkedListRealization<E> implements ListRealization<E> {
     Node<E> firstElement;
     Node<E> lastElement;
 
-    Node<E> currentElement;
-    Node<E> prevElement;
+    private int size = 0;
 
     @Override
     public void add(E element) {
-        prevElement = currentElement;
-
-        Node<E> newNode = new Node<>(element);
-
-        currentElement = newNode;
-
-        prevElement.setNext(newNode);
-        newNode.setPrevious(prevElement);
+        Node<E> l = lastElement;
+        Node<E> newNode = new Node<>(l, element, null);
         lastElement = newNode;
+
+        if (l == null) {
+            firstElement = newNode;
+        } else {
+            l.setNext(newNode);
+        }
+        size++;
+
     }
 
     @Override
@@ -28,23 +33,85 @@ public class LinkedListRealization<E> implements ListRealization<E> {
 
     @Override
     public boolean remove(E element) {
+        for (Node<E> x = firstElement; x != null; x = x.getNext()) {
+            if (Objects.equals(element, x.getValue())) {
+                unlink(x);
+                return true;
+            }
+        }
         return false;
+    }
+
+    private void unlink(Node<E> x) {
+        Node<E> next = x.getNext();
+        Node<E> prev = x.getPrevious();
+
+        if (prev == null) {
+            firstElement = next;
+        } else {
+            prev.setNext(next);
+            x.setPrevious(null);
+        }
+
+        if (next == null) {
+            lastElement = prev;
+        } else {
+            next.setPrevious(prev);
+            x.setNext(null);
+        }
+
+        x.setValue(null);
+        size--;
     }
 
     @Override
     public E get(int index) {
-        return null;
+        if (index < 0 || index >= size) {
+            throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size);
+        }
+
+        Node<E> x = firstElement;
+        for (int i = 0; i < index; i++) {
+            x = x.getNext();
+        }
+        return x.getValue();
+    }
+
+    @Override
+    public Iterator<E> iterator() {
+        return new Iterator<>() {
+            private Node<E> nextNode = firstElement;
+
+            @Override
+            public boolean hasNext() {
+                return nextNode != null;
+            }
+
+            @Override
+            public E next() {
+                if (!hasNext()) throw new NoSuchElementException();
+                E value = nextNode.getValue();
+                nextNode = nextNode.getNext();
+                return value;
+            }
+        };
+    }
+
+    @Override
+    public void forEach(Consumer<? super E> action) {
+        ListRealization.super.forEach(action);
     }
 }
 
 class Node<E> {
-    E value;
+    private E value;
+    private Node<E> next;
+    private Node<E> previous;
 
-    Node<E> next;
-    Node<E> previous;
-
-    public Node(E value) {
+    public Node(Node<E> previous, E value, Node<E> next) {
         this.value = value;
+        this.next = next;
+        this.previous = previous;
     }
 
     public E getValue() {
