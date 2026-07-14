@@ -47,7 +47,7 @@ public class ArrayListRealization<E> implements ListRealization<E> {
     }
 
     @Override
-    public boolean remove(Object element) {
+    public boolean remove(E element) {
         for (int i = 0; i < size; i++) {
             if ((element == null && list[i] == null) || (element != null && element.equals(list[i]))) {
                 fastRemove(i);
@@ -91,10 +91,5 @@ public class ArrayListRealization<E> implements ListRealization<E> {
                 return list[cursor++];
             }
         };
-    }
-
-    @Override
-    public void forEach(Consumer<? super E> action) {
-        ListRealization.super.forEach(action);
     }
 }

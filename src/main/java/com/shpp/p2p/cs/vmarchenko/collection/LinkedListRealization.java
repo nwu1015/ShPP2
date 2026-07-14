@@ -3,13 +3,48 @@ package com.shpp.p2p.cs.vmarchenko.collection;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
-import java.util.function.Consumer;
 
 public class LinkedListRealization<E> implements ListRealization<E> {
     Node<E> firstElement;
     Node<E> lastElement;
 
     private int size = 0;
+
+    private static class Node<E> {
+        private E value;
+        private Node<E> next;
+        private Node<E> previous;
+
+        public Node(Node<E> previous, E value, Node<E> next) {
+            this.value = value;
+            this.next = next;
+            this.previous = previous;
+        }
+
+        public E getValue() {
+            return value;
+        }
+
+        public void setValue(E value) {
+            this.value = value;
+        }
+
+        public Node<E> getNext() {
+            return next;
+        }
+
+        public void setNext(Node<E> next) {
+            this.next = next;
+        }
+
+        public Node<E> getPrevious() {
+            return previous;
+        }
+
+        public void setPrevious(Node<E> previous) {
+            this.previous = previous;
+        }
+    }
 
     @Override
     public void add(E element) {
@@ -28,7 +63,41 @@ public class LinkedListRealization<E> implements ListRealization<E> {
 
     @Override
     public void add(int index, E element) {
+        if (index < 0 || index > size) {
+            throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size);
+        }
 
+        if (index == size) {
+            add(element);
+        } else {
+            Node<E> succ = node(index);
+            Node<E> pred = succ.getPrevious();
+            Node<E> newNode = new Node<>(pred, element, succ);
+            succ.setPrevious(newNode);
+
+            if (pred == null) {
+                firstElement = newNode;
+            } else {
+                pred.setNext(newNode);
+            }
+            size++;
+        }
+    }
+
+    private Node<E> node(int index) {
+        if (index < (size >> 1)) {
+            Node<E> x = firstElement;
+            for (int i = 0; i < index; i++) {
+                x = x.getNext();
+            }
+            return x;
+        } else {
+            Node<E> x = lastElement;
+            for (int i = size - 1; i > index; i--) {
+                x = x.getPrevious();
+            }
+            return x;
+        }
     }
 
     @Override
@@ -95,46 +164,5 @@ public class LinkedListRealization<E> implements ListRealization<E> {
                 return value;
             }
         };
-    }
-
-    @Override
-    public void forEach(Consumer<? super E> action) {
-        ListRealization.super.forEach(action);
-    }
-}
-
-class Node<E> {
-    private E value;
-    private Node<E> next;
-    private Node<E> previous;
-
-    public Node(Node<E> previous, E value, Node<E> next) {
-        this.value = value;
-        this.next = next;
-        this.previous = previous;
-    }
-
-    public E getValue() {
-        return value;
-    }
-
-    public void setValue(E value) {
-        this.value = value;
-    }
-
-    public Node<E> getNext() {
-        return next;
-    }
-
-    public void setNext(Node<E> next) {
-        this.next = next;
-    }
-
-    public Node<E> getPrevious() {
-        return previous;
-    }
-
-    public void setPrevious(Node<E> previous) {
-        this.previous = previous;
     }
 }
